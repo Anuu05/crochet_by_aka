@@ -2,8 +2,11 @@ import yarn from "./yarn.svg";
 import search_icon from "./search_icon.svg";
 import nav_cart_icon from "./nav_cart_icon.svg";
 import menu_icon from "./menu_icon.svg"
+import remove_icon from "./remove_icon.svg"
 import profile_icon from "./profile_icon.png";
 import star_icon from "./star_icon.svg";
+import order_icon from "./order_icon.svg";
+import product_list_icon from "./product_list_icon.svg";
 import star_dull_icon from "./star_dull_icon.svg";
 import main from "./main.jpg";
 import bandana from "./bandana.jpg";
@@ -26,17 +29,26 @@ import tulip from "./tulip.jpg"
 import winerose from "./wine-rose.jpg"
 import carticon from "./cart_icon.svg"
 import aboutus from "./aboutus.jpeg"
+import add_icon from "./add_icon.svg";
+import upload_area from "./upload_area.png";
+import arrow_right_icon_colored from "./arrow_right_icon_colored.svg"
 
 export const assets = {
   yarn,
   search_icon,
+  upload_area,
   nav_cart_icon,
     menu_icon,
+    add_icon,
      profile_icon,
      main,
      star_icon,
+     remove_icon,
      star_dull_icon,
+     order_icon,
+     product_list_icon,
      carticon,
+     arrow_right_icon_colored,
      bandana,
      blueclip,
      creamclip,
@@ -723,62 +735,62 @@ export const dummyProducts = [
 //   },
  ];
 
-// export const dummyAddress = [
-//   {
-//     _id: "67b5b9e54ea97f71bbc196a0",
-//     userId: "67b5880e4d09769c5ca61644",
-//     firstName: "Great",
-//     lastName: "Stack",
-//     email: "user.greatstack@gmail.com",
-//     street: "Street 123",
-//     city: "Main City",
-//     state: "New State",
-//     zipcode: 123456,
-//     country: "IN",
-//     phone: "1234567890",
-//   },
-// ];
+export const dummyAddress = [
+  {
+    _id: "67b5b9e54ea97f71bbc196a0",
+    userId: "67b5880e4d09769c5ca61644",
+    firstName: "Great",
+    lastName: "Stack",
+    email: "user.greatstack@gmail.com",
+    street: "Street 123",
+    city: "Main City",
+    state: "New State",
+    zipcode: 123456,
+    country: "IN",
+    phone: "1234567890",
+  },
+];
 
-// export const dummyOrders = [
-//   {
-//     _id: "67e2589a8f87e63366786400",
-//     userId: "67b5880e4d09769c5ca61644",
-//     items: [
-//       {
-//         product: dummyProducts[3],
-//         quantity: 2,
-//         _id: "67e2589a8f87e63366786401",
-//       },
-//     ],
-//     amount: 89,
-//     address: dummyAddress[0],
-//     status: "Order Placed",
-//     paymentType: "Online",
-//     isPaid: true,
-//     createdAt: "2025-03-25T07:17:46.018Z",
-//     updatedAt: "2025-03-25T07:18:13.103Z",
-//   },
-//   {
-//     _id: "67e258798f87e633667863f2",
-//     userId: "67b5880e4d09769c5ca61644",
-//     items: [
-//       {
-//         product: dummyProducts[0],
-//         quantity: 1,
-//         _id: "67e258798f87e633667863f3",
-//       },
-//       {
-//         product: dummyProducts[1],
-//         quantity: 1,
-//         _id: "67e258798f87e633667863f4",
-//       },
-//     ],
-//     amount: 43,
-//     address: dummyAddress[0],
-//     status: "Order Placed",
-//     paymentType: "COD",
-//     isPaid: false,
-//     createdAt: "2025-03-25T07:17:13.068Z",
-//     updatedAt: "2025-03-25T07:17:13.068Z",
-//   },
-// ];
+export const dummyOrders = [
+  {
+    _id: "67e2589a8f87e63366786400",
+    userId: "67b5880e4d09769c5ca61644",
+    items: [
+      {
+        product: dummyProducts[3],
+        quantity: 2,
+        _id: "67e2589a8f87e63366786401",
+      },
+    ],
+    amount: 89,
+    address: dummyAddress[0],
+    status: "Order Placed",
+    paymentType: "Online",
+    isPaid: true,
+    createdAt: "2025-03-25T07:17:46.018Z",
+    updatedAt: "2025-03-25T07:18:13.103Z",
+  },
+  {
+    _id: "67e258798f87e633667863f2",
+    userId: "67b5880e4d09769c5ca61644",
+    items: [
+      {
+        product: dummyProducts[0],
+        quantity: 1,
+        _id: "67e258798f87e633667863f3",
+      },
+      {
+        product: dummyProducts[1],
+        quantity: 1,
+        _id: "67e258798f87e633667863f4",
+      },
+    ],
+    amount: 43,
+    address: dummyAddress[0],
+    status: "Order Placed",
+    paymentType: "COD",
+    isPaid: false,
+    createdAt: "2025-03-25T07:17:13.068Z",
+    updatedAt: "2025-03-25T07:17:13.068Z",
+  },
+];

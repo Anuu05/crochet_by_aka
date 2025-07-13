@@ -11,5 +11,7 @@
   --primary-color-dull:
 } */
 
-
+.no-scrollbar::-webkit-scrollbar{
+  display: none;
+}
 
