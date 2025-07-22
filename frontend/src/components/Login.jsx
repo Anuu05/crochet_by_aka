@@ -1,32 +1,36 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
+import toast from 'react-hot-toast';
 
 const Login = () => {
-  const [state, setState] = useState("login");
+  const [state, setState] = useState("login"); // login or register
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { setUser, setShowUserLogin } = useAppContext();
+  const { setUser, setShowUserLogin, axios, navigate } = useAppContext();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!email || !password || (state === "register" && !name)) {
-      alert("Please fill in all required fields.");
-      return;
-    }
+    try {
+      const payload = { email, password };
+      if (state === "register") payload.name = name;
 
-    if (state === "register") {
-      alert("Account created successfully!");
-      setState("login");
-      setName("");
-      setEmail("");
-      setPassword("");
-    } else {
-      setUser({ name: name || "User", email });
-      setShowUserLogin(false); // close login modal
-      alert("Login successful!");
+      const { data } = await axios.post(`/api/user/${state}`, payload);
+
+      if (data.success) {
+  localStorage.setItem("user", JSON.stringify(data.user)); // Persist user
+  setUser(data.user);                                       // Update context state
+  setShowUserLogin(false);                                  // Hide login modal
+  navigate('/');                                            // Redirect to home
+  toast.success(data.message || "Login successful");       // Show success toast
+} else {
+  toast.error(data.message);
+}
+
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message || "Something went wrong");
     }
   };
 
@@ -41,8 +45,7 @@ const Login = () => {
         className="flex flex-col gap-4 items-start p-8 py-12 w-80 sm:w-[352px] rounded-lg shadow-xl border border-gray-200 bg-white"
       >
         <p className="text-2xl font-medium m-auto">
-          <span className="text-indigo-500">User</span>{" "}
-          {state === "login" ? "Login" : "Sign Up"}
+          <span className="text-indigo-500">User</span> {state === "login" ? "Login" : "Sign Up"}
         </p>
 
         {state === "register" && (

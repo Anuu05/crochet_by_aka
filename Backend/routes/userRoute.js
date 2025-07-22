@@ -4,9 +4,10 @@ import authUser from "../middleware/authUser.js";
 
 const userRouter = express.Router();
 
-userRouter.post('/register', register)
-userRouter.post('/login', login)
-userRouter.get('/is-auth', authUser, isAuth)
-userRouter.get('/logout', authUser, logout)
+userRouter.post("/register", register);
+userRouter.post("/login", login);
+userRouter.get("/is-auth", authUser, isAuth);
+// Logout route without auth middleware to allow logout anytime
+userRouter.get("/logout", logout);
 
 export default userRouter;

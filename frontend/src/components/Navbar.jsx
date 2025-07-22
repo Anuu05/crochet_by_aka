@@ -2,16 +2,27 @@ import React, { useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const [open, setOpen] = React.useState(false);
-  const { user, setUser, setShowUserLogin, navigate , searchQuery, setSearchQuery, getCartCount } = useAppContext();
+  const { user, setUser, setShowUserLogin, navigate , searchQuery, setSearchQuery, getCartCount, axios } = useAppContext();
 
-  const logout = () => {
-    setUser(null);
-    navigate("/");
-    setOpen(false);
-  };
+const logout = async () => {
+  try {
+    const { data } = await axios.get('/api/user/logout');
+    if (data.success) {
+      toast.success(data.message);
+      setUser(null);      // Clear user state on logout
+      navigate("/");      // Redirect to homepage or login
+    } else {
+      toast.error(data.message || "Logout failed");
+    }
+  } catch (error) {
+    toast.error(error.response?.data?.message || error.message || "Network error");
+  }
+};
+
 
 useEffect(() => {
   if (searchQuery.length > 0) {
