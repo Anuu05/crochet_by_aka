@@ -8,6 +8,6 @@ userRouter.post("/register", register);
 userRouter.post("/login", login);
 userRouter.get("/is-auth", authUser, isAuth);
 // Logout route without auth middleware to allow logout anytime
-userRouter.get("/logout", logout);
+userRouter.get("/logout", authUser, logout);
 
 export default userRouter;

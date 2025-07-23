@@ -1,142 +1,171 @@
-import React, { useEffect, useState } from 'react';
-import { useAppContext } from '../context/AppContext';
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import { assets } from '../assets/assets';
-import ProductCard from '../components/ProductCard';
+import React, { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { useAppContext } from "../context/AppContext";
+import { assets } from "../assets/assets";
+import ProductCard from "../components/ProductCard";
 
 const ProductDetails = () => {
-  const { products, addToCart } = useAppContext();
+  const { products, navigate, currency, addToCart } = useAppContext();
   const { id } = useParams();
-  const navigate = useNavigate();
 
+  // Find the current product
+  const product = products.find(item => item._id === id);
+
+  // Local state
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [thumbnail, setThumbnail] = useState(null);
 
-  const product = products.find((item) => item._id === id);
-
+  // Build related products once product is available
   useEffect(() => {
-    if (product && products.length > 0) {
+    if (product) {
       const related = products
-        .filter((item) => item.category === product.category && item._id !== product._id)
+        .filter(
+          item =>
+            item.category === product.category &&
+            item._id !== product._id &&
+            item.inStock
+        )
         .slice(0, 5);
       setRelatedProducts(related);
     }
-  }, [products, product]);
+  }, [product, products]);
 
+  // Set the main thumbnail when product loads
   useEffect(() => {
-    setThumbnail(product?.image?.[0] || null);
+    setThumbnail(product?.image[0] ?? null);
   }, [product]);
 
-  return product && (
-    <div className="mt-10 px-6 md:px-20 py-6 text-gray-800 bg-white rounded-lg shadow-sm">
+  // Fallback if no product found
+  if (!product) {
+    return (
+      <div className="flex justify-center items-center mt-20">
+        <p className="text-gray-500">Product not found or loading…</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-12 px-4 md:px-0">
       {/* Breadcrumb */}
       <p className="text-sm text-gray-600 mb-4">
         <Link to="/" className="hover:underline">Home</Link> /
-        <Link to="/products" className="hover:underline"> Products</Link> /
-        <Link to={`/products/${product.category.toLowerCase()}`} className="hover:underline"> {product.category}</Link> /
-        <span className="text-indigo-600 font-semibold"> {product.name}</span>
+        <Link to="/products" className="hover:underline ml-1">Products</Link> /
+        <Link
+          to={`/products/${product.category.toLowerCase()}`}
+          className="hover:underline ml-1 capitalize"
+        >
+          {product.category}
+        </Link> /
+        <span className="text-primary ml-1">{product.name}</span>
       </p>
 
-      <div className="flex flex-col md:flex-row gap-10">
-        {/* Left: Images */}
+      {/* Main Content */}
+      <div className="flex flex-col md:flex-row gap-16">
+        {/* Thumbnails & Main Image */}
         <div className="flex gap-4">
-          {/* Thumbnails */}
           <div className="flex flex-col gap-3">
-            {product.image.map((img, i) => (
+            {product.image.map((imgUrl, idx) => (
               <div
-                key={i}
-                onClick={() => setThumbnail(img)}
-                className="border border-gray-300 w-20 h-20 rounded cursor-pointer overflow-hidden hover:ring-2 ring-indigo-400 transition"
+                key={idx}
+                onClick={() => setThumbnail(imgUrl)}
+                className="border border-gray-300 rounded overflow-hidden cursor-pointer max-w-[60px]"
               >
-                <img src={img} alt={`Thumbnail ${i}`} className="object-cover w-full h-full" />
+                <img
+                  src={imgUrl}
+                  alt={`${product.name} thumbnail ${idx + 1}`}
+                  className="w-full h-auto"
+                />
               </div>
             ))}
           </div>
-
-          {/* Main image */}
-          <div className="border border-gray-300 rounded overflow-hidden w-80 h-80">
-            <img src={thumbnail} alt="Product" className="object-contain w-full h-full" />
+          <div className="border border-gray-300 rounded overflow-hidden flex-shrink-0">
+            <img
+              src={thumbnail}
+              alt={`${product.name} selected`}
+              className="w-[300px] h-auto"
+            />
           </div>
         </div>
 
-        {/* Right: Product Info */}
-        <div className="md:w-1/2">
-          <h1 className="text-3xl font-semibold text-gray-800">{product.name}</h1>
-
-          {/* Rating */}
-          <div className="flex items-center gap-1 mt-2">
-            {Array(5).fill('').map((_, i) => (
+        {/* Product Details */}
+        <div className="flex-1 text-gray-700">
+          <h1 className="text-3xl font-semibold mb-2">{product.name}</h1>
+          <div className="flex items-center gap-1 mb-4">
+            {Array.from({ length: 5 }).map((_, i) => (
               <img
                 key={i}
                 src={i < 4 ? assets.star_icon : assets.star_dull_icon}
-                alt="star"
+                alt={`${i < 4 ? "filled" : "empty"} star`}
                 className="w-4 h-4"
               />
             ))}
-            <span className="text-gray-500 ml-2 text-sm">(4 reviews)</span>
+            <span className="ml-2 text-sm text-gray-500">(4)</span>
           </div>
 
-          {/* Pricing */}
-          <div className="mt-6">
-            <p className="text-gray-400 line-through text-base">
-              MRP: Rs. {product.price}
+          <div className="mb-6">
+            <p className="line-through text-gray-500">
+              MRP: {currency}{product.price}
             </p>
-            <p className="text-2xl font-bold text-indigo-600 mt-1">
-              Rs. {product.offerPrice}
+            <p className="text-2xl font-medium">
+              MRP: {currency}{product.offerPrice}
             </p>
-            <span className="text-sm text-gray-500">(inclusive of all taxes)</span>
+            <p className="text-xs text-gray-500">(inclusive of all taxes)</p>
           </div>
 
-          {/* Description */}
-          <div className="mt-6">
-            <p className="text-lg font-medium text-gray-700 mb-2">About Product:</p>
-            <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-              {product.description.map((line, i) => (
-                <li key={i}>{line}</li>
+          <div className="mb-6">
+            <p className="font-medium mb-2">About this product</p>
+            <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
+              {product.description.map((line, idx) => (
+                <li key={idx}>{line}</li>
               ))}
             </ul>
           </div>
 
-          {/* Buttons */}
-          <div className="mt-8 flex gap-4">
+          <div className="flex gap-4">
             <button
               onClick={() => addToCart(product._id)}
-              className="w-full py-3 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium transition"
+              className="flex-1 py-3 bg-gray-100 text-gray-800 rounded hover:bg-gray-200 transition"
             >
               Add to Cart
             </button>
             <button
-              onClick={() => {
-                addToCart(product._id);
-                navigate('/cart');
+              onClick={() => { 
+                navigate("/cart");
+                window.scrollTo(0, 0);
               }}
-              className="w-full py-3 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition"
+              className="flex-1 py-3 bg-primary text-white rounded hover:bg-primary-dull transition"
             >
               Buy Now
             </button>
           </div>
         </div>
       </div>
-      
-    <div className="mt-14 border-t border-gray-200 pt-10">
-  <div className="mb-6">
-    <p className="text-2xl font-semibold text-gray-800">Related Products</p>
-  </div>
 
-  <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-5 sm:grid-cols-2">
-    {relatedProducts.filter((product) => product.inStock).map((product, index) => (
-      <ProductCard key={index} product={product} />
-    ))}
-  </div>
+      {/* Related Products */}
+      {relatedProducts.length > 0 && (
+        <div className="mt-20 flex flex-col items-center">
+          <div className="flex flex-col items-center">
+            <p className="text-3xl font-medium">Related Products</p>
+            <div className="w-20 h-0.5 bg-primary rounded-full mt-2"></div>
+          </div>
 
-  <div className="flex justify-center mt-8">
-    <button onClick={()=> {navigate('/products') ; scrollTo(0,0)}} className="px-6 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700 transition font-medium">
-      See More
-    </button>
-  </div>
-</div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-6 w-full">
+            {relatedProducts.map(item => (
+              <ProductCard key={item._id} product={item} />
+            ))}
+          </div>
 
-
+          <button
+            onClick={() => {
+              navigate("/products");
+              window.scrollTo(0, 0);
+            }}
+            className="mt-8 px-12 py-3 border border-primary text-primary rounded hover:bg-primary/10 transition"
+          >
+            See More
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,45 +1,47 @@
 import React from 'react';
-import { useAppContext } from '../context/AppContext';
 import { useParams } from 'react-router-dom';
-import { categories } from '../assets/assets';
+import { useAppContext } from '../context/AppContext';
 import ProductCard from '../components/ProductCard';
+import { categories } from '../assets/assets';
 
 const ProductCategory = () => {
-  const { products } = useAppContext();
   const { category } = useParams();
+  const { products } = useAppContext();
 
+  // Get the category info from the category list
   const searchCategory = categories.find(
-    (item) => item.path.toLowerCase() === category?.toLowerCase()
+    (item) => item.path.toLowerCase() === category.toLowerCase()
   );
 
+  // Filter products by selected category
   const filteredProducts = products.filter(
-    (product) =>
-      product.category?.toLowerCase().trim() === category?.toLowerCase().trim()
+    (product) => product.category.toLowerCase() === category.toLowerCase()
   );
 
   return (
-    <div className="px-4 sm:px-6 md:px-12 lg:px-20 py-10 min-h-screen bg-white text-gray-800">
+    <div className="mt-16">
       {searchCategory && (
-        <div className="mb-8 text-center">
-          <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-indigo-600">
-            {searchCategory.text.toUpperCase()}
-          </h1>
+        <div className="flex flex-col items-end w-max">
+          <p className="text-2xl font-medium">{searchCategory.text.toUpperCase()}</p>
+          <div className="w-16 h-0.5 bg-primary rounded-full"></div>
         </div>
       )}
 
       {filteredProducts.length > 0 ? (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-6 mt-6">
           {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product._id} product={product} />
           ))}
         </div>
       ) : (
-        <div className="text-center text-gray-400 mt-10 text-base sm:text-lg">
-          <p>No products found in this category.</p>
+        <div className="flex items-center justify-center h-[60vh]">
+          <p className="text-2xl font-medium text-primary">
+            No products found in this category.
+          </p>
         </div>
       )}
     </div>
   );
 };
 
-export default ProductCategory;
+export default ProductCategory

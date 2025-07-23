@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useAppContext } from '../context/AppContext';
+import toast from 'react-hot-toast';
 
 // Reusable InputField component
 const InputField = ({ type, placeholder, name, handleChange, address }) => (
@@ -14,6 +16,9 @@ const InputField = ({ type, placeholder, name, handleChange, address }) => (
 );
 
 const AddAddress = () => {
+
+  const{axios, user, navigate} = useAppContext();
+
   const [address, setAddress] = useState({
     firstName: '',
     lastName: '',
@@ -21,7 +26,7 @@ const AddAddress = () => {
     street: '',
     city: '',
     state: '',
-    zipcode: '',
+    zipCode: '',
     country: '',
     phone: '',
   });
@@ -37,8 +42,25 @@ const AddAddress = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    console.log('Submitted Address:', address);
+   try {
+    const {data} = await axios.post('/api/address',{address})
+    if(data.success){
+      toast.success(data.message)
+      navigate('/cart')
+    }else{
+      toast.error(data.message)
+    }
+   } catch (error) {
+     toast.error(error.message)
+   }
   };
+
+  useEffect(()=>{
+if(!user){
+  navigate('/cart')
+
+}
+  },[])
 
   return (
     <div className="p-6 max-w-lg mx-auto">
@@ -54,7 +76,7 @@ const AddAddress = () => {
           <InputField handleChange={handleChange} address={address} name="street" type="text" placeholder="Street Address" />
           <InputField handleChange={handleChange} address={address} name="city" type="text" placeholder="City" />
           <InputField handleChange={handleChange} address={address} name="state" type="text" placeholder="State" />
-          <InputField handleChange={handleChange} address={address} name="zipcode" type="number" placeholder="Zip Code" />
+          <InputField handleChange={handleChange} address={address} name="zipCode" type="number" placeholder="Zip Code" />
           <InputField handleChange={handleChange} address={address} name="country" type="text" placeholder="Country" />
         </div>
         <button

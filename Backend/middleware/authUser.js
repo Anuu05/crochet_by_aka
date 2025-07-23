@@ -1,18 +1,19 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
 const authUser = (req, res, next) => {
   try {
     const token = req.cookies.token;
     if (!token) {
-      return res.status(401).json({ success: false, message: "Not Authorized" });
+      return res.json({ success: false, message: "No Authorization token provided" });
     }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { id: decoded.id };
+    const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
+    if (!tokenDecode || !tokenDecode.id) {
+      return res.json({ success: false, message: "Not authorized" });
+    }
+    req.id = tokenDecode.id;
     next();
   } catch (error) {
-    console.error("Auth error:", error.message);
-    return res.status(401).json({ success: false, message: "Not Authorized" });
+    res.json({ success: false, message: error.message });
   }
 };
 
