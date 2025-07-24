@@ -1,13 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { dummyOrders, assets } from '../../assets/assets';
+import { assets } from '../../assets/assets'; // ensure defaultProduct is available here
+import toast from 'react-hot-toast';
 
 const Orders = () => {
-  const { currency } = useAppContext();
+  const { currency, axios } = useAppContext();
   const [orders, setOrders] = useState([]);
 
   const fetchOrders = async () => {
-    setOrders(dummyOrders);
+    try {
+      const { data } = await axios.get('/api/order/seller');
+      if (data.success) {
+        setOrders(data.orders);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {
@@ -15,72 +25,76 @@ const Orders = () => {
   }, []);
 
   return (
-    <div className="md:p-10 p-4 space-y-4">
+    <div className="md:p-10 p-4 space-y-6 bg-gray-50 min-h-screen">
       <h2 className="text-xl font-semibold text-gray-800">Orders List</h2>
 
-      {orders.map((order, index) => (
-        <div
-          key={index}
-          className="flex flex-col md:grid md:grid-cols-[2fr_1.5fr_1fr_1fr] gap-5 p-5 border border-gray-300 rounded-md bg-white text-gray-800 max-w-5xl"
-        >
-          {/* Items Section */}
-          <div className="flex gap-4">
-
-            <div className="space-y-1">
+      {orders.length === 0 ? (
+        <p className="text-gray-500">No orders found.</p>
+      ) : (
+        orders.map((order, index) => (
+          <div
+            key={index}
+            className="flex flex-col md:flex-row justify-between p-4 border border-gray-200 rounded-lg bg-white shadow-sm"
+          >
+            {/* 🛍 Items */}
+            <div className="flex flex-col space-y-4 mb-4 md:mb-0">
               {order.items.map((item, itemIndex) => (
-                <p key={itemIndex} className="text-sm font-medium">
-                  {item.product.name}{' '}
-                  <span
-                    className={`text-indigo-500 ${
-                      item.quantity < 2 ? 'hidden' : ''
-                    }`}
-                  >
-                    x {item.quantity}
-                  </span>
-                </p>
+                <div key={itemIndex} className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded overflow-hidden border">
+                    <img
+                      src={item.product.image?.[0] || assets.defaultProduct}
+                      alt={item.product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">
+                      {item.product.name}
+                      {item.quantity > 1 && (
+                        <span className="text-indigo-600 ml-1">x {item.quantity}</span>
+                      )}
+                    </p>
+                    <p className="text-xs text-gray-500">{item.product.category}</p>
+                  </div>
+                </div>
               ))}
             </div>
-          </div>
 
-          {/* Address Section */}
-          <div className="text-sm">
-            <p className="font-medium mb-1">
-              {order.address.firstName} {order.address.lastName}
-            </p>
-            <p>
-              {order.address.street}, {order.address.city}
-            </p>
-            <p>
-              {order.address.state}, {order.address.zipcode},{' '}
-              {order.address.country}
-            </p>
-            <p>{order.address.phone}</p>
-          </div>
+            {/* 📦 Address */}
+            <div className="text-sm text-gray-700 space-y-1 mb-4 md:mb-0">
+              <p className="font-medium">
+                {order.address.firstName} {order.address.lastName}
+              </p>
+              <p>
+                {[order.address.street, order.address.city].filter(Boolean).join(', ')}
+              </p>
+              <p>
+                {[order.address.state, order.address.zipcode, order.address.country]
+                  .filter(Boolean)
+                  .join(', ')}
+              </p>
+              <p>{order.address.phone}</p>
+            </div>
 
-          {/* Price */}
-          <div className="text-base font-semibold text-black/70 flex items-center">
-            {currency} {order.amount}
-          </div>
+            {/* 💰 Amount */}
+            <div className="text-lg font-semibold text-gray-800 flex items-center mb-4 md:mb-0">
+              {currency} {order.amount}
+            </div>
 
-          {/* Order Info */}
-          <div className="text-sm flex flex-col justify-center space-y-1">
-            <p>Method: {order.paymentType}</p>
-            <p>
-              Date: {new Date(order.createdAt).toLocaleDateString('en-GB')}
-            </p>
-            <p>
-              Payment:{' '}
-              <span
-                className={`${
-                  order.isPaid ? 'text-green-600' : 'text-red-500'
-                } font-medium`}
-              >
-                {order.isPaid ? 'Paid' : 'Pending'}
-              </span>
-            </p>
+            {/* 📄 Order Details */}
+            <div className="text-sm text-gray-700 flex flex-col justify-center space-y-1">
+              <p>Method: {order.paymentType}</p>
+              <p>Date: {new Date(order.createdAt).toLocaleDateString('en-GB')}</p>
+              <p>
+                Payment:{' '}
+                <span className={order.isPaid ? 'text-green-600 font-medium' : 'text-red-500 font-medium'}>
+                  {order.isPaid ? 'Paid' : 'Pending'}
+                </span>
+              </p>
+            </div>
           </div>
-        </div>
-      ))}
+        ))
+      )}
     </div>
   );
 };

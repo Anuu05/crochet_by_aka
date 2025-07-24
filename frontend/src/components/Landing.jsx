@@ -22,7 +22,7 @@ const Landing = () => {
           <p className="text-sm md:text-lg mb-6">
             Beautifully designed and made with love.
           </p>
-    <Link to="/product">
+    <Link to="/products">
           <button
             className="
               bg-green-500 hover:bg-green-600

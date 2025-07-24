@@ -1,5 +1,5 @@
 import express from "express";
-import { upload } from "../configs/multer.js"; // ✅ correct named import
+import { upload } from "../configs/multer.js";
 import authSeller from "../middleware/authSeller.js";
 import {
   addProduct,
@@ -7,19 +7,27 @@ import {
   productById,
   productList,
 } from "../controllers/productController.js";
+import Product from "../models/Product.js"; // <-- Add this import
 
 const productRouter = express.Router();
 
-// Add Product
 productRouter.post("/add", upload.array("images"), authSeller, addProduct);
-
-// Get all products
 productRouter.get("/list", productList);
-
-// Get product by ID using URL param
 productRouter.get("/id/:id", productById);
-
-// Update stock status
 productRouter.post("/stock", authSeller, changeStock);
+
+// ✅ Add this new route
+productRouter.put("/update/:id", authSeller, async (req, res) => {
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json({ success: true, product: updatedProduct });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+});
 
 export default productRouter;

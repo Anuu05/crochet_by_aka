@@ -50,7 +50,7 @@ useEffect(() => {
       <div className="hidden sm:flex items-center gap-6">
         <NavLink to="/" className="hover:text-emerald-500">Home</NavLink>
         <NavLink to="/products" className="hover:text-emerald-500">Products</NavLink>
-        <NavLink to="/" className="hover:text-emerald-500">Contact</NavLink>
+      
 
         {/* Search (Desktop only) */}
         <div className="hidden lg:flex items-center text-sm gap-2 border border-gray-300 px-3 rounded-full">

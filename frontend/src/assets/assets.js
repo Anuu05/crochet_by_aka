@@ -127,9 +127,8 @@ export const footerLinks = [
   {
     title: "Follow Us",
     links: [
-      { text: "Instagram", url: "#" },
-      { text: "Twitter", url: "#" },
-      { text: "Facebook", url: "#" },
+      { text: "Instagram", url: "https://www.instagram.com/crochet_by_aka/" },
+      { text: "Tiktok", url: "https://www.tiktok.com/@crochet_by_aka?is_from_webapp=1&sender_device=pc" },
       { text: "YouTube", url: "#" },
     ],
   },
