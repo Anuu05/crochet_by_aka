@@ -8,12 +8,12 @@ export const register = async (req, res) => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-      return res.json({ success: false, message: "Missing Details" });
+      return res.status(400).json({ success: false, message: "Missing Details" });
     }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.json({ success: false, message: "User already exists" });
+      return res.status(409).json({ success: false, message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -30,15 +30,17 @@ export const register = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return res.json({
+    return res.status(201).json({
       success: true,
-      message: { email: user.email, name: user.name },
+      message: "User registered successfully",
+      user: { email: user.email, name: user.name },
     });
   } catch (error) {
-    console.log(error.message);
-    res.json({ success: false, message: "User already exists" });
+    console.error("Register Error:", error.message);
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 // Login
 export const login = async (req, res) => {

@@ -5,12 +5,14 @@ import { useAppContext } from "../context/AppContext";
 const ProductCard = ({ product }) => {
   const { currency, addToCart, removeFromCart, cartItems, navigate } = useAppContext();
 
-  return product && (
+  if (!product) return null;
+
+  return (
     <div
-      onClick={() => navigate(`/products/${product.category.toLowerCase()}/${product._id}`)} // ✅ fixed route
-      className="border border-gray-500/20 rounded-md md:px-4 px-3 py-2 bg-white min-w-[14rem] max-w-[14rem] w-full cursor-pointer hover:shadow-md transition"
+      onClick={() => navigate(`/products/${product.category.toLowerCase()}/${product._id}`)}
+      className="border border-gray-500/20 rounded-md md:px-4 px-3 py-3 bg-white min-w-[14rem] max-w-[14rem] w-full cursor-pointer hover:shadow-md transition"
     >
-      <div className="group cursor-pointer flex items-center justify-center px-2">
+      <div className="group cursor-pointer flex items-center justify-center px-2 mb-3">
         <img
           className="group-hover:scale-105 transition max-w-26 md:max-w-36"
           src={product.image[0]}
@@ -19,18 +21,18 @@ const ProductCard = ({ product }) => {
       </div>
 
       <div className="text-gray-500/60 text-sm">
-        <p>{product.category}</p>
-        <p className="text-gray-700 font-medium text-lg truncate w-full">
-          {product.name.slice(0, 40)}{product.name.length > 40 && "..."}
+        <p className="mb-1">{product.category}</p>
+        <p className="text-gray-700 font-medium text-base sm:text-base truncate w-full mb-2">
+          {product.name.length > 40 ? product.name.slice(0, 40) + "..." : product.name}
         </p>
 
-        <div className="flex items-center gap-0.5">
+        <div className="flex items-center gap-1 mb-3">
           {Array(5)
             .fill("")
             .map((_, i) => (
               <img
                 key={i}
-                className="md:w-3.5 w3"
+                className="md:w-3.5 w-3"
                 src={i < 4 ? assets.star_icon : assets.star_dull_icon}
                 alt="star"
               />
@@ -38,21 +40,25 @@ const ProductCard = ({ product }) => {
           <p>(4)</p>
         </div>
 
-        <div className="flex items-end justify-between mt-3">
-          <p className="md:text-xl text-base font-medium text-indigo-500">
-            {currency || "Rs"} {product.offerPrice}{" "}
-            <span className="text-gray-500/60 md:text-sm text-xs line-through">
-              {currency || "Rs"} {product.price}
-            </span>
-          </p>
+        <div className="flex items-center justify-between mt-3 flex-wrap gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="text-indigo-500 font-semibold text-base sm:text-lg md:text-xl">
+              {currency || "Rs"} {product.offerPrice}
+            </p>
+            {product.price !== product.offerPrice && (
+              <p className="text-gray-500 line-through text-xs sm:text-sm md:text-base">
+                {currency || "Rs"} {product.price}
+              </p>
+            )}
+          </div>
 
-          <div onClick={(e) => e.stopPropagation()} className="text-indigo-500">
+          <div onClick={(e) => e.stopPropagation()} className="text-indigo-500 mt-2 sm:mt-0">
             {!cartItems[product._id] ? (
               <button
                 className="flex items-center justify-center gap-1 bg-indigo-100 border border-indigo-300 md:w-[80px] w-[64px] h-[34px] rounded text-indigo-600 font-medium cursor-pointer"
                 onClick={() => addToCart(product._id)}
               >
-                <img src={assets.carticon} alt="" />
+                <img src={assets.carticon} alt="Add to cart" />
                 Add
               </button>
             ) : (

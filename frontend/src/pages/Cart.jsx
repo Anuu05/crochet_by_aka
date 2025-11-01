@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
-import { assets, dummyAddress } from "../assets/assets";
+import { assets } from "../assets/assets";
 import toast from "react-hot-toast";
 
 const Cart = () => {
@@ -18,8 +18,8 @@ const Cart = () => {
   } = useAppContext();
 
   const [cartArray, setCartArray] = useState([]);
-  const [addresses, setAddresses] = useState(dummyAddress);
-  const [selectedAddress, setSelectedAddress] = useState(dummyAddress[0]);
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentOption, setPaymentOption] = useState("COD");
   const [showAddress, setShowAddress] = useState(false);
 
@@ -28,59 +28,57 @@ const Cart = () => {
     for (const key in cartItems) {
       const product = products.find((item) => item._id === key);
       if (product) {
-        const updatedProduct = { ...product, quantity: cartItems[key] };  // ✅ Fixed quantity
+        const updatedProduct = { ...product, quantity: cartItems[key] };
         tempArray.push(updatedProduct);
       }
     }
     setCartArray(tempArray);
   };
 
-  const getUserAddress = async()=>{
+  const getUserAddress = async () => {
     try {
-      const {data} = await axios.get('/api/address/get')
-      if(data.success){
-        setAddresses(data.addresses)
-        if(data.addresses.length>0){
-          setSelectedAddress(data.addresses[0])
+      const { data } = await axios.get("/api/address/get");
+      if (data.success) {
+        setAddresses(data.addresses);
+        if (data.addresses.length > 0) {
+          setSelectedAddress(data.addresses[0]);
         }
-      }else{
-toast.error(data.message)
+      } else {
+        toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.message);
     }
-  }
+  };
 
   const placeOrder = async () => {
     try {
-      if(!selectedAddress){
-        return toast.error("Please Select an Address")
-
+      if (!selectedAddress) {
+        return toast.error("Please select an address");
       }
-      //place order with COD
-      if(paymentOption === "COD"){
-        const {data} = await axios.post('/api/order/cod', {
-          userId: user._id,
-          items: cartArray.map(item=> ({
-            product: item._id, quantity: item.quantity
-          })),
-          address: selectedAddress._id
-        })
 
-        if(data.success){
-          toast.success(data.message)
-          setCartItems({})
-          navigate('/my-orders')
-        } else{
-           toast.error(data.message)
+      if (paymentOption === "COD") {
+        const { data } = await axios.post("/api/order/cod", {
+          userId: user._id,
+          items: cartArray.map((item) => ({
+            product: item._id,
+            quantity: item.quantity,
+          })),
+          address: selectedAddress._id,
+        });
+
+        if (data.success) {
+          toast.success(data.message);
+          setCartItems({});
+          navigate("/my-orders");
+        } else {
+          toast.error(data.message);
         }
       }
     } catch (error) {
-             toast.error(error.message)
+      toast.error(error.message);
     }
-    };
-
-
+  };
 
   useEffect(() => {
     if (products.length > 0 && cartItems) {
@@ -88,12 +86,11 @@ toast.error(data.message)
     }
   }, [products, cartItems]);
 
-
-  useEffect(()=>{
-    if(user){
-      getUserAddress()
+  useEffect(() => {
+    if (user) {
+      getUserAddress();
     }
-  },[user])
+  }, [user]);
 
   return products.length > 0 && cartItems ? (
     <div className="flex flex-col md:flex-row mt-14">
@@ -144,7 +141,7 @@ toast.error(data.message)
                       onChange={(e) =>
                         updateCartItems(product._id, Number(e.target.value))
                       }
-                      value={product.quantity} // ✅ Fixed to use product.quantity
+                      value={product.quantity}
                       className="outline-none"
                     >
                       {Array(
@@ -195,11 +192,13 @@ toast.error(data.message)
         <div className="mb-6">
           <p className="text-sm font-medium uppercase">Delivery Address</p>
           <div className="relative flex justify-between items-start mt-2">
-            <p className="text-gray-500">
-              {selectedAddress
-                ? `${selectedAddress.street}, ${selectedAddress.city}, ${selectedAddress.state}, ${selectedAddress.country}`
-                : "No address found"}
-            </p>
+            {selectedAddress && (
+              <p className="text-gray-500">
+                {selectedAddress.street}, {selectedAddress.city},{" "}
+                {selectedAddress.state}, {selectedAddress.country}
+              </p>
+            )}
+
             <button
               onClick={() => setShowAddress(!showAddress)}
               className="text-indigo-500 hover:underline cursor-pointer"
@@ -255,12 +254,12 @@ toast.error(data.message)
           </p>
           <p className="flex justify-between">
             <span>Tax (2%)</span>
-            <span>Rs. {(getCartAmount() * 2 / 100).toFixed(2)}</span>
+            <span>Rs. {(getCartAmount() * 0.02).toFixed(2)}</span>
           </p>
           <p className="flex justify-between text-lg font-medium mt-3">
             <span>Total Amount:</span>
             <span>
-              Rs. {(getCartAmount() + getCartAmount() * 2 / 100).toFixed(2)}
+              Rs. {(getCartAmount() * 1.02).toFixed(2)}
             </span>
           </p>
         </div>
