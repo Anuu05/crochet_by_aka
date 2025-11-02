@@ -13,7 +13,8 @@ const AddProduct = () => {
 
   const { axios } = useAppContext();
 
-  useEffect(() => {
+  useEffect(
+    () => {
     // Cleanup created object URLs to avoid memory leaks
     return () => {
       files.forEach((file) => URL.revokeObjectURL(file));
